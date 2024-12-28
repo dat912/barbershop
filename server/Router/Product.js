@@ -22,15 +22,26 @@ router.get("/categories", (req, res) => {
     }
   });
 });
-//sp dua theo id loai
+// Thêm API tìm kiếm sản phẩm
 router.get("/products", (req, res) => {
-  const { category_id } = req.query;
+  const { category_id, search } = req.query;
 
-  const sql = category_id
-    ? "SELECT * FROM product WHERE category_id = ?"
-    : "SELECT * FROM product";
+  let sql = "SELECT * FROM product";
+  const params = [];
 
-  db.query(sql, [category_id], (err, results) => {
+  // Nếu có tham số tìm kiếm, thêm điều kiện WHERE
+  if (search) {
+    sql += " WHERE ten LIKE ?";
+    params.push(`%${search}%`);
+  }
+
+  // Nếu có category_id, thêm điều kiện lọc danh mục
+  if (category_id) {
+    sql += search ? " AND category_id = ?" : " WHERE category_id = ?";
+    params.push(category_id);
+  }
+
+  db.query(sql, params, (err, results) => {
     if (err) {
       console.error("Lỗi truy vấn sản phẩm:", err.message);
       res.status(500).send("Lỗi server.");

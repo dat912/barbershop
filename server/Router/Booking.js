@@ -89,9 +89,9 @@ router.post("/kiemtragio", (req, res) => {
   const query = `
       SELECT gio 
       FROM datlich 
-      WHERE idchinhanh = ? AND ngay = ? AND idnhanvien = ?
+      WHERE idchinhanh = ? AND ngay = ? AND idnhanvien = ? AND (idtrangthai = 1 OR idtrangthai = 2)
   `;
-  //
+
   db.query(query, [idchinhanh, ngay, idnhanvien], (err, results) => {
     if (err) {
       console.error("Lỗi khi truy vấn:", err);

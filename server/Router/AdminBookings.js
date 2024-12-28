@@ -161,7 +161,6 @@ router.get("/getHoaDonBooking/:id", (req, res) => {
     JOIN user ON datlich.iduser = user.id
     WHERE trangthai.id = 3 AND datlich.id = ?`; //
 
-  // Thực hiện truy vấn với id được truyền vào
   db.query(query, [id], (error, results) => {
     if (error) {
       return res.status(500).json({ error: "Database error" });

@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import numeral from "numeral";
+import DatePicker from "react-datepicker";
+import { Modal, Button, DropdownButton, Dropdown } from "react-bootstrap";
+import "react-datepicker/dist/react-datepicker.css";
+import "bootstrap/dist/css/bootstrap.min.css";
 import {
   BsCash,
   BsFillArchiveFill,
@@ -22,14 +26,78 @@ import {
   Line,
 } from "recharts";
 import "./App.css";
-//
+
 function Home() {
   const [product, setProduct] = useState([]);
   const [category, setCategory] = useState([]);
   const [user, setUser] = useState([]);
   const [nhanvien, setNhanvien] = useState([]);
-  const [tongTienBooking, setTongTienBooking] = useState([]);
   const [tongTienDonHang, setTongTienDonHang] = useState([]);
+  const [tongTienBooking, setTongTienBooking] = useState({});
+  const [showModal, setShowModal] = useState(false); //modal datlich
+  const [showModalDonHang, setShowModalDonHang] = useState(false); //modal donhang
+  const [filterType, setFilterType] = useState(""); // "ngày", "tháng", hoặc "quý"
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedMonth, setSelectedMonth] = useState(1); // Mặc định là tháng 1
+  const [selectedQuarter, setSelectedQuarter] = useState(1); // Mặc định là quý 1
+
+  useEffect(() => {
+    fetchTongTien("ngày", new Date());
+    fetchTongTienDonHang("ngày", new Date());
+  }, []);
+
+  const fetchTongTien = (type, value) => {
+    let url = `http://localhost:8080/tongTienDatLich?filter=${type}`;
+
+    if (type === "ngày") {
+      url += `&date=${value.toISOString().split("T")[0]}`;
+    } else if (type === "tháng") {
+      url += `&month=${value}`;
+    } else if (type === "quý") {
+      url += `&quarter=${value}`;
+    }
+
+    axios.get(url).then((response) => {
+      setTongTienBooking(response.data[0] || { total: 0 });
+    });
+  };
+
+  const fetchTongTienDonHang = (type, value) => {
+    let url = `http://localhost:8080/tongTienDonHang?filter=${type}`;
+
+    if (type === "ngày") {
+      url += `&date=${value.toISOString().split("T")[0]}`;
+    } else if (type === "tháng") {
+      url += `&month=${value}`;
+    } else if (type === "quý") {
+      url += `&quarter=${value}`;
+    }
+
+    axios.get(url).then((response) => {
+      setTongTienDonHang(response.data[0] || { total: 0 });
+    });
+  };
+
+  const handleSelectFilter = () => {
+    if (filterType === "ngày") {
+      fetchTongTien("ngày", selectedDate);
+    } else if (filterType === "tháng") {
+      fetchTongTien("tháng", selectedMonth);
+    } else if (filterType === "quý") {
+      fetchTongTien("quý", selectedQuarter);
+    }
+    setShowModal(false); // Đóng modal
+  };
+  const handleSelectFilterDonHang = () => {
+    if (filterType === "ngày") {
+      fetchTongTienDonHang("ngày", selectedDate);
+    } else if (filterType === "tháng") {
+      fetchTongTienDonHang("tháng", selectedMonth);
+    } else if (filterType === "quý") {
+      fetchTongTienDonHang("quý", selectedQuarter);
+    }
+    setShowModalDonHang(false);
+  };
 
   useEffect(() => {
     axios.get("http://localhost:8080/countProducts").then((response) => {
@@ -52,19 +120,6 @@ function Home() {
       setTongTienDonHang(response.data[0]);
     });
   }, []);
-
-  //   useEffect(() => {
-  //     axios
-  //       .get("http://localhost:8080/countProducts")
-  //       .then((result) => {
-  //         if (result.data && result.data[0]) {
-  //           setProduct(result.data[0]);
-  //         } else {
-  //           alert("Không có dữ liệu");
-  //         }
-  //       })
-  //       .catch((err) => console.error("Error:", err));
-  //   }, []);
 
   const data = [
     {
@@ -147,7 +202,11 @@ function Home() {
         <div className="card">
           <div className="card-inner">
             <h3>TOTAL Đặt lịch</h3>
-            <BsCash className="card_icon" />
+            <BsCash
+              className="card_icon"
+              onClick={() => setShowModal(true)} // Mở modal khi nhấn icon
+              style={{ cursor: "pointer" }}
+            />
           </div>
           <h3>
             {numeral(tongTienBooking.total).format("0,0").replace(/,/g, ".")}{" "}
@@ -158,7 +217,11 @@ function Home() {
         <div className="card">
           <div className="card-inner">
             <h3>TOTAL Đơn hàng</h3>
-            <BsCash className="card_icon" />
+            <BsCash
+              className="card_icon"
+              onClick={() => setShowModalDonHang(true)} // Mở modal khi nhấn icon
+              style={{ cursor: "pointer" }}
+            />
           </div>
           <h3>
             {numeral(tongTienDonHang.total).format("0,0").replace(/,/g, ".")}{" "}
@@ -166,6 +229,146 @@ function Home() {
           </h3>
         </div>
       </div>
+      {/* Modal TOTAL Đặt lịch */}
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+        <Modal.Header closeButton className="font-monospace">
+          <Modal.Title>Chọn lọc theo</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <DropdownButton title="Chọn loại lọc" className="mb-3 font-monospace">
+            <Dropdown.Item onClick={() => setFilterType("ngày")}>
+              Theo Ngày
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => setFilterType("tháng")}>
+              Theo Tháng
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => setFilterType("quý")}>
+              Theo Quý
+            </Dropdown.Item>
+          </DropdownButton>
+
+          {filterType === "ngày" && (
+            <div className="font-monospace">
+              <h5 className="font-monospace">Chọn ngày:</h5>
+              <DatePicker
+                selected={selectedDate}
+                onChange={(date) => setSelectedDate(date)}
+                dateFormat="yyyy-MM-dd"
+              />
+            </div>
+          )}
+
+          {filterType === "tháng" && (
+            <div className="font-monospace">
+              <h5 className="font-monospace">Chọn tháng:</h5>
+              <DropdownButton title={`Tháng ${selectedMonth}`} className="mb-3">
+                {[...Array(12).keys()].map((month) => (
+                  <Dropdown.Item
+                    key={month}
+                    onClick={() => setSelectedMonth(month + 1)}
+                  >
+                    Tháng {month + 1}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+            </div>
+          )}
+
+          {filterType === "quý" && (
+            <div className="font-monospace">
+              <h5 className="font-monospace">Chọn quý:</h5>
+              <DropdownButton title={`Quý ${selectedQuarter}`} className="mb-3">
+                {[1, 2, 3, 4].map((quarter) => (
+                  <Dropdown.Item
+                    key={quarter}
+                    onClick={() => setSelectedQuarter(quarter)}
+                  >
+                    Quý {quarter}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleSelectFilter}>
+            Áp dụng
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      {/* Modal TOTAL Đơn hàng */}
+      <Modal
+        show={showModalDonHang}
+        onHide={() => setShowModalDonHang(false)}
+        centered
+      >
+        <Modal.Header closeButton className="font-monospace">
+          <Modal.Title>Chọn lọc cho TOTAL Đơn hàng</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {/* Nội dung lọc tương tự */}
+          {/* Tái sử dụng nội dung tương tự Modal của TOTAL Đặt lịch */}
+          <DropdownButton title="Chọn loại lọc" className="mb-3 font-monospace">
+            <Dropdown.Item onClick={() => setFilterType("ngày")}>
+              Theo Ngày
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => setFilterType("tháng")}>
+              Theo Tháng
+            </Dropdown.Item>
+            <Dropdown.Item onClick={() => setFilterType("quý")}>
+              Theo Quý
+            </Dropdown.Item>
+          </DropdownButton>
+
+          {filterType === "ngày" && (
+            <div className="font-monospace">
+              <h5 className="font-monospace">Chọn ngày:</h5>
+              <DatePicker
+                selected={selectedDate}
+                onChange={(date) => setSelectedDate(date)}
+                dateFormat="yyyy-MM-dd"
+              />
+            </div>
+          )}
+
+          {filterType === "tháng" && (
+            <div className="font-monospace">
+              <h5 className="font-monospace">Chọn tháng:</h5>
+              <DropdownButton title={`Tháng ${selectedMonth}`} className="mb-3">
+                {[...Array(12).keys()].map((month) => (
+                  <Dropdown.Item
+                    key={month}
+                    onClick={() => setSelectedMonth(month + 1)}
+                  >
+                    Tháng {month + 1}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+            </div>
+          )}
+
+          {filterType === "quý" && (
+            <div className="font-monospace">
+              <h5 className="font-monospace">Chọn quý:</h5>
+              <DropdownButton title={`Quý ${selectedQuarter}`} className="mb-3">
+                {[1, 2, 3, 4].map((quarter) => (
+                  <Dropdown.Item
+                    key={quarter}
+                    onClick={() => setSelectedQuarter(quarter)}
+                  >
+                    Quý {quarter}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleSelectFilterDonHang}>
+            Áp dụng
+          </Button>
+        </Modal.Footer>
+      </Modal>
 
       <div className="charts">
         <ResponsiveContainer width="100%" height="100%">

@@ -35,18 +35,56 @@ router.get("/countNhanVien", (req, res) => {
 });
 
 router.get("/tongTienDatLich", (req, res) => {
-  const sql = "SELECT SUM(tongtien) AS total FROM datlich;";
+  const { filter, date, month, quarter } = req.query;
+  let sql;
+
+  switch (filter) {
+    case "ngày":
+      sql = `SELECT SUM(tongtien) AS total FROM datlich WHERE ngay = '${date}'`;
+      break;
+    case "tháng":
+      sql = `SELECT SUM(tongtien) AS total FROM datlich WHERE MONTH(ngay) = ${month}`;
+      break;
+    case "quý":
+      sql = `
+        SELECT SUM(tongtien) AS total FROM datlich 
+        WHERE QUARTER(ngay) = ${quarter}
+      `;
+      break;
+    default:
+      sql = "SELECT SUM(tongtien) AS total FROM datlich";
+  }
+
   db.query(sql, (err, result) => {
-    if (err) return res.json({ Message: "Err  inside server " });
-    return res.json(result);
+    if (err) return res.status(500).json({ message: "Error inside server" });
+    res.status(200).json(result);
   });
 });
 
 router.get("/tongTienDonHang", (req, res) => {
-  const sql = "SELECT SUM(tongtien) AS total FROM donhang;";
+  const { filter, date, month, quarter } = req.query;
+  let sql;
+
+  switch (filter) {
+    case "ngày":
+      sql = `SELECT SUM(tongtien) AS total FROM donhang WHERE DATE(created_at) = '${date}'`;
+      break;
+    case "tháng":
+      sql = `SELECT SUM(tongtien) AS total FROM donhang WHERE MONTH(created_at) = ${month}`;
+      break;
+    case "quý":
+      sql = `
+        SELECT SUM(tongtien) AS total FROM donhang 
+        WHERE QUARTER(created_at) = ${quarter}
+      `;
+      break;
+    default:
+      sql = "SELECT SUM(tongtien) AS total FROM donhang";
+  }
+
   db.query(sql, (err, result) => {
-    if (err) return res.json({ Message: "Err  inside server " });
-    return res.json(result);
+    if (err) return res.status(500).json({ message: "Error inside server" });
+    res.status(200).json(result);
   });
 });
 

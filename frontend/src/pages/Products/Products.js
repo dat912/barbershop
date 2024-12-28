@@ -65,7 +65,7 @@ export default function Products() {
     try {
       const url = selectedCategory
         ? `http://localhost:8080/products?category_id=${selectedCategory}`
-        : "http://localhost:8080/products";
+        : `http://localhost:8080/products?search=${searchTerm}`;
 
       const response = await axios.get(url);
       setProducts(response.data);
@@ -76,6 +76,17 @@ export default function Products() {
 
   const handleCategoryClick = (categoryId) => {
     setSelectedCategory(categoryId); // Cập nhật danh mục được chọn
+  };
+
+  // tim kiem
+  const [searchTerm, setSearchTerm] = useState("");
+  useEffect(() => {
+    fetchCategories();
+    fetchProducts();
+  }, [selectedCategory, searchTerm]);
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value); // Cập nhật từ khóa tìm kiếm
   };
 
   return (
@@ -115,7 +126,18 @@ export default function Products() {
 
         <div className={cx("right")}>
           <div className="row">
+            {/* Tìm kiếm */}
+            <div className="col-12 mb-3">
+              <input
+                type="text"
+                placeholder="Tìm kiếm sản phẩm..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                className="form-control"
+              />
+            </div>
             <h3>Sản phẩm</h3>
+
             {products.map((product) => (
               <div key={product.id} className="col-lg-3 col-md-4 col-sm-6 mb-4">
                 <div className="card bg-white h-100">

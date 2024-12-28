@@ -12,7 +12,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import numeral from "numeral";
-
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 export default function Infor() {
   const [activeTab, setActiveTab] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);
@@ -25,6 +26,27 @@ export default function Infor() {
   const [bookings, setBookings] = useState([]);
   const [hoadon, setHoadon] = useState([]);
   const userId = localStorage.getItem("id");
+
+  const handleStatusUpdate = (bookingId) => {
+    if (window.confirm("Bạn có đồng ý hủy lịch này không?")) {
+      axios
+        .put("http://localhost:8080/api/huylich", { id: bookingId })
+        .then((response) => {
+          alert("Lịch đã được hủy thành công.");
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error(
+            "Lỗi khi hủy lịch:",
+            error.response ? error.response.data : error.message
+          );
+          alert(
+            "Đã xảy ra lỗi khi hủy lịch. " +
+              (error.response ? error.response.data.error : error.message)
+          );
+        });
+    }
+  };
 
   const groupedHoaDon = hoadon.reduce((acc, item) => {
     if (!acc[item.madonhang]) {
@@ -87,7 +109,7 @@ export default function Infor() {
 
   return (
     <div className="min-vh-100 bg-light">
-      <main className="container py-4">
+      <main className="container py-4 font-monospace ">
         <div className="row g-4  ">
           {/* Sidebar */}
           <div className="col-md-3">
@@ -258,11 +280,18 @@ export default function Infor() {
                           <div className="col">
                             <div className="d-flex flex-column gap-2">
                               <div className="d-flex align-items-center gap-2">
+                                <span className="text-dark">
+                                  Mã lịch đặt : {booking.id}
+                                </span>
+                              </div>
+
+                              <div className="d-flex align-items-center gap-2">
                                 <MapPin className="text-primary" />
                                 <span className="text-dark">
                                   {booking.TenChiNhanh}
                                 </span>
                               </div>
+
                               <div className="d-flex align-items-center gap-2">
                                 <Package className="text-primary" />
                                 <span className="text-dark">
@@ -329,6 +358,18 @@ export default function Infor() {
                             </div>
                           </div>
                         </div>
+                        {/* Thêm nút Hủy ở dưới cùng bên phải */}
+                        {(booking.TenTrangThai === "Đã xác nhận" ||
+                          booking.TenTrangThai === "Chờ xác nhận") && (
+                          <div className="d-flex justify-content-end mt-3">
+                            <button
+                              className="btn btn-danger"
+                              onClick={() => handleStatusUpdate(booking.id)}
+                            >
+                              Hủy lịch
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}

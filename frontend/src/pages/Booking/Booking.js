@@ -215,6 +215,12 @@ export default function Booking() {
             name="ngay"
             onChange={handleInputChange}
             required
+            min={new Date().toISOString().split("T")[0]}
+            max={
+              new Date(new Date().setDate(new Date().getDate() + 30))
+                .toISOString()
+                .split("T")[0]
+            }
           />
         </div>
 

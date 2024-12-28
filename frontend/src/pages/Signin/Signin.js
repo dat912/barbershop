@@ -42,44 +42,14 @@ export default function Signin() {
           window.location.reload();
           alert("Đăng nhập thành công");
         } else {
-          alert(res.data.message || "Số điện thoại hoặc mật khẩu không sai");
+          alert(res.data.message || "Số điện thoại hoặc mật khẩu sai");
         }
       })
       .catch((err) => {
         console.error(err);
-        alert("Số điện thoại hoặc mật khẩu không sai"); // Thông báo lỗi chung
+        alert("Số điện thoại hoặc mật khẩu sai"); // Thông báo lỗi chung
       });
   };
-
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   console.log(values);
-
-  //   axios.post('http://localhost:8080/login', values)
-  //     .then(res => {
-  //       // Kiểm tra phản hồi của API
-  //       if (res.result === "success") { // Giả sử server trả về { success: true, ten: 'Tên Người Dùng', ... }
-
-  //         // Lưu thông tin vào localStorage
-  //         localStorage.setItem("phone", values.phone);
-  //         localStorage.setItem("ten", res.data.ten);  // Lưu tên từ phản hồi của API
-
-  //         // Điều hướng đến trang /dat-lich
-  //         navigate('/dat-lich');
-
-  //         // Thông báo đăng nhập thành công
-  //         alert("Đăng nhập thành công");
-  //         window.location.reload(); // Làm mới trang
-  //       } else {
-  //         // Thông báo nếu tài khoản không tồn tại
-  //         alert("Tài khoản không tồn tại");
-  //       }
-  //     })
-  //     .catch(err => {
-  //       console.log(err);
-  //       alert("Có lỗi xảy ra khi đăng nhập");
-  //     });
-  // };
 
   if (!localStorage.getItem("phone")) {
     return (

@@ -42,6 +42,7 @@ router.get("/bookings/:userId", (req, res) => {
   // const query = 'SELECT chinhanh.tenchinhanh AS TenChiNhanh,dichvu.tendichvu AS TenDichVu,nhanvien.ten AS TenNhanVien,datlich.ngay AS Ngay,datlich.gio AS Gio,datlich.tongtien AS TongTien,trangthai.ten AS TenTrangThai FROM datlich JOIN chinhanh ON datlich.idchinhanh = chinhanh.id JOIN dichvu ON datlich.iddichvu = dichvu.id JOIN nhanvien ON datlich.idnhanvien = nhanvien.id JOIN trangthai ON datlich.idtrangthai = trangthai.id Where iduser=? ';
   const query = `
       SELECT 
+          datlich.id AS id,
           chinhanh.tenchinhanh AS TenChiNhanh,
           dichvu.tendichvu AS TenDichVu,
           nhanvien.ten AS TenNhanVien,
@@ -97,6 +98,29 @@ ORDER BY donhang.created_at DESC`;
       return res.status(500).json({ error: "Database error" });
     }
     res.json(results);
+  });
+});
+
+router.put("/huylich", (req, res) => {
+  const { id } = req.body;
+
+  const query = `
+    UPDATE datlich 
+    SET idtrangthai = 4 
+    WHERE id = ?`;
+
+  db.query(query, [id], (error, results) => {
+    if (error) {
+      console.error("Lỗi cơ sở dữ liệu:", error);
+      return res
+        .status(500)
+        .json({ error: "Lỗi cơ sở dữ liệu khi cập nhật trạng thái." });
+    }
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ error: "Không tìm thấy lịch để hủy." });
+    }
+
+    res.json({ message: "Lịch đã được hủy thành công." });
   });
 });
 
