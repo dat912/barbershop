@@ -108,7 +108,7 @@ export default function Booking() {
         );
         alert("Đặt lịch thành công");
         console.log(response.data);
-        navigate("/dat-lich");
+        navigate("/thanh-cong");
         window.location.reload();
       } catch (error) {
         console.error(
@@ -233,9 +233,13 @@ export default function Booking() {
             {gios.map((gio) => (
               <label
                 key={gio}
-                className={`btn btn-outline-dark m-1 col-3 mb-2 ${
+                className={`btn m-1 col-3 mb-2   ${
                   selectedGio === gio ? "active" : ""
-                } ${gioDaDat.includes(gio) ? "disabled" : ""}`}
+                } ${
+                  gioDaDat.includes(gio)
+                    ? "disabled btn-danger border-1"
+                    : "btn-outline-dark border-1"
+                }`}
               >
                 <input
                   type="radio"

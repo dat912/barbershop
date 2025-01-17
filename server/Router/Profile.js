@@ -56,7 +56,7 @@ router.get("/bookings/:userId", (req, res) => {
       JOIN nhanvien ON datlich.idnhanvien = nhanvien.id
       JOIN trangthai ON datlich.idtrangthai = trangthai.id
       WHERE iduser = ?
-      ORDER BY datlich.ngay DESC, datlich.gio DESC`;
+      ORDER BY datlich.id DESC `;
   db.query(query, [id], (error, results) => {
     if (error) {
       return res.status(500).json({ error: "Database error" });

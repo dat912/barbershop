@@ -27,21 +27,12 @@ export default function Footer() {
             <li className={cx("li")}>
               <FontAwesomeIcon icon={faPhone} />: 0988888888
             </li>
-
-            <li className={cx("li-social")}>
-              <FontAwesomeIcon className={cx("social")} icon={faFacebook} />
-              <FontAwesomeIcon
-                className={cx("social")}
-                icon={faFacebookMessenger}
-              />
-              <FontAwesomeIcon className={cx("social")} icon={faInstagram} />
-            </li>
           </ul>
         </div>
         <div className={cx("mid")}></div>
         <div className={cx("right")}>
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d15678.588015957772!2d106.6977036!3d10.7616648!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f92a4562461%3A0xa6370716a3cf5cfb!2sThe%20Men%20Barber%20Shop!5e0!3m2!1svi!2s!4v1727100996163!5m2!1svi!2s"
+            src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d15679.817641153899!2d106.6778321!3d10.7379972!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f62a90e5dbd%3A0x674d5126513db295!2zVHLGsOG7nW5nIMSQ4bqhaSBo4buNYyBDw7RuZyBuZ2jhu4cgU8OgaSBHw7Ju!5e0!3m2!1svi!2s!4v1717820687943!5m2!1svi!2s"
             className={cx("map")}
             allowfullscreen=""
             loading="lazy"

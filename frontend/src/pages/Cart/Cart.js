@@ -15,6 +15,14 @@ const Cart = () => {
   } = useShoppingContext();
   const navigate = useNavigate();
 
+  const userId = localStorage.getItem("id");
+
+  useEffect(() => {
+    if (!userId) {
+      navigate("/dang-nhap");
+    }
+  }, [userId, navigate]);
+
   // Modal state
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState("");
@@ -89,10 +97,10 @@ const Cart = () => {
   useEffect(() => {
     const shouldClearCart = localStorage.getItem("clearCartAfterPayment");
     if (shouldClearCart === "true") {
-      clearCart(); // Gọi hàm xóa giỏ hàng
+      clearCart();
       localStorage.removeItem("clearCartAfterPayment");
     }
-  }, []);
+  }, [clearCart]);
 
   const handlePlaceOrderMoMo = async () => {
     // Kiểm tra thông tin địa chỉ

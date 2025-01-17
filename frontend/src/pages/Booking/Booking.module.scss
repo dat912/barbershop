@@ -13,6 +13,7 @@
   .form-input {
     margin: 10px;
     width: 100%;
+    
     display: flex;
     flex-direction: column;
     
@@ -22,31 +23,24 @@
       font-family:'Courier New', Courier, monospace;
     }
     select{
-      border: 1px solid #000000;
+      border: 2px solid #000000;
       padding: 12px;
       font-size: 14px;
+      color: #000000;
+      font-weight:300;
       border-radius: 5px;
     }
     input {
-      border: 1px solid #000000;
+      color: #000000;
       padding: 12px;
       font-size: 14px;
       border-radius: 5px;
-      
+      font-weight:300;
       &:focus {
         outline: none;
       }
     }
-    textarea {
-      padding: 10px;
-      height: 300px;
-      border-radius: 5px;
-      resize: none;
-      font-size: 17px;
-      &:focus {
-        outline: none;
-      }
-    }
+    
   }
   .list-address {
     padding: 20px;

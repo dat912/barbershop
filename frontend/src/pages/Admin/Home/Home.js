@@ -40,37 +40,39 @@ function Home() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedMonth, setSelectedMonth] = useState(1); // Mặc định là tháng 1
   const [selectedQuarter, setSelectedQuarter] = useState(1); // Mặc định là quý 1
+  // chọn năm trong thống kê
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState(currentYear); // Năm mặc định là năm hiện tại
 
   useEffect(() => {
-    fetchTongTien("ngày", new Date());
+    fetchTongTienBooking("ngày", new Date());
     fetchTongTienDonHang("ngày", new Date());
   }, []);
 
-  const fetchTongTien = (type, value) => {
+  const fetchTongTienBooking = (type, value, year) => {
     let url = `http://localhost:8080/tongTienDatLich?filter=${type}`;
 
     if (type === "ngày") {
       url += `&date=${value.toISOString().split("T")[0]}`;
     } else if (type === "tháng") {
-      url += `&month=${value}`;
+      url += `&month=${value}&year=${year}`;
     } else if (type === "quý") {
-      url += `&quarter=${value}`;
+      url += `&quarter=${value}&year=${year}`;
     }
 
     axios.get(url).then((response) => {
       setTongTienBooking(response.data[0] || { total: 0 });
     });
   };
-
-  const fetchTongTienDonHang = (type, value) => {
+  const fetchTongTienDonHang = (type, value, year) => {
     let url = `http://localhost:8080/tongTienDonHang?filter=${type}`;
 
     if (type === "ngày") {
       url += `&date=${value.toISOString().split("T")[0]}`;
     } else if (type === "tháng") {
-      url += `&month=${value}`;
+      url += `&month=${value}&year=${year}`;
     } else if (type === "quý") {
-      url += `&quarter=${value}`;
+      url += `&quarter=${value}&year=${year}`;
     }
 
     axios.get(url).then((response) => {
@@ -80,21 +82,21 @@ function Home() {
 
   const handleSelectFilter = () => {
     if (filterType === "ngày") {
-      fetchTongTien("ngày", selectedDate);
+      fetchTongTienBooking("ngày", selectedDate);
     } else if (filterType === "tháng") {
-      fetchTongTien("tháng", selectedMonth);
+      fetchTongTienBooking("tháng", selectedMonth, selectedYear);
     } else if (filterType === "quý") {
-      fetchTongTien("quý", selectedQuarter);
+      fetchTongTienBooking("quý", selectedQuarter, selectedYear);
     }
-    setShowModal(false); // Đóng modal
+    setShowModal(false);
   };
   const handleSelectFilterDonHang = () => {
     if (filterType === "ngày") {
       fetchTongTienDonHang("ngày", selectedDate);
     } else if (filterType === "tháng") {
-      fetchTongTienDonHang("tháng", selectedMonth);
+      fetchTongTienDonHang("tháng", selectedMonth, selectedYear);
     } else if (filterType === "quý") {
-      fetchTongTienDonHang("quý", selectedQuarter);
+      fetchTongTienDonHang("quý", selectedQuarter, selectedYear);
     }
     setShowModalDonHang(false);
   };
@@ -231,11 +233,11 @@ function Home() {
       </div>
       {/* Modal TOTAL Đặt lịch */}
       <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-        <Modal.Header closeButton className="font-monospace">
-          <Modal.Title>Chọn lọc theo</Modal.Title>
+        <Modal.Header closeButton className="font-monospace fw-bolder">
+          <Modal.Title>Chọn lọc cho tổng tiền Đặt lịch</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <DropdownButton title="Chọn loại lọc" className="mb-3 font-monospace">
+          <DropdownButton title="Chọn loại lọc" className="mb-3">
             <Dropdown.Item onClick={() => setFilterType("ngày")}>
               Theo Ngày
             </Dropdown.Item>
@@ -248,8 +250,8 @@ function Home() {
           </DropdownButton>
 
           {filterType === "ngày" && (
-            <div className="font-monospace">
-              <h5 className="font-monospace">Chọn ngày:</h5>
+            <div>
+              <h5>Chọn ngày:</h5>
               <DatePicker
                 selected={selectedDate}
                 onChange={(date) => setSelectedDate(date)}
@@ -259,8 +261,8 @@ function Home() {
           )}
 
           {filterType === "tháng" && (
-            <div className="font-monospace">
-              <h5 className="font-monospace">Chọn tháng:</h5>
+            <div>
+              <h5>Chọn tháng:</h5>
               <DropdownButton title={`Tháng ${selectedMonth}`} className="mb-3">
                 {[...Array(12).keys()].map((month) => (
                   <Dropdown.Item
@@ -271,12 +273,24 @@ function Home() {
                   </Dropdown.Item>
                 ))}
               </DropdownButton>
+
+              <h5>Chọn năm:</h5>
+              <DropdownButton title={`Năm ${selectedYear}`} className="mb-3">
+                {[...Array(10).keys()].map((year) => (
+                  <Dropdown.Item
+                    key={year}
+                    onClick={() => setSelectedYear(currentYear - year)}
+                  >
+                    Năm {currentYear - year}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
             </div>
           )}
 
           {filterType === "quý" && (
-            <div className="font-monospace">
-              <h5 className="font-monospace">Chọn quý:</h5>
+            <div>
+              <h5>Chọn quý:</h5>
               <DropdownButton title={`Quý ${selectedQuarter}`} className="mb-3">
                 {[1, 2, 3, 4].map((quarter) => (
                   <Dropdown.Item
@@ -284,6 +298,18 @@ function Home() {
                     onClick={() => setSelectedQuarter(quarter)}
                   >
                     Quý {quarter}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+
+              <h5>Chọn năm:</h5>
+              <DropdownButton title={`Năm ${selectedYear}`} className="mb-3">
+                {[...Array(10).keys()].map((year) => (
+                  <Dropdown.Item
+                    key={year}
+                    onClick={() => setSelectedYear(currentYear - year)}
+                  >
+                    Năm {currentYear - year}
                   </Dropdown.Item>
                 ))}
               </DropdownButton>
@@ -302,13 +328,11 @@ function Home() {
         onHide={() => setShowModalDonHang(false)}
         centered
       >
-        <Modal.Header closeButton className="font-monospace">
-          <Modal.Title>Chọn lọc cho TOTAL Đơn hàng</Modal.Title>
+        <Modal.Header closeButton className="font-monospace fw-bolder">
+          <Modal.Title>Chọn lọc cho tổng tiền Đơn hàng</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {/* Nội dung lọc tương tự */}
-          {/* Tái sử dụng nội dung tương tự Modal của TOTAL Đặt lịch */}
-          <DropdownButton title="Chọn loại lọc" className="mb-3 font-monospace">
+          <DropdownButton title="Chọn loại lọc" className="mb-3">
             <Dropdown.Item onClick={() => setFilterType("ngày")}>
               Theo Ngày
             </Dropdown.Item>
@@ -321,8 +345,8 @@ function Home() {
           </DropdownButton>
 
           {filterType === "ngày" && (
-            <div className="font-monospace">
-              <h5 className="font-monospace">Chọn ngày:</h5>
+            <div>
+              <h5>Chọn ngày:</h5>
               <DatePicker
                 selected={selectedDate}
                 onChange={(date) => setSelectedDate(date)}
@@ -332,8 +356,8 @@ function Home() {
           )}
 
           {filterType === "tháng" && (
-            <div className="font-monospace">
-              <h5 className="font-monospace">Chọn tháng:</h5>
+            <div>
+              <h5>Chọn tháng:</h5>
               <DropdownButton title={`Tháng ${selectedMonth}`} className="mb-3">
                 {[...Array(12).keys()].map((month) => (
                   <Dropdown.Item
@@ -344,12 +368,24 @@ function Home() {
                   </Dropdown.Item>
                 ))}
               </DropdownButton>
+
+              <h5>Chọn năm:</h5>
+              <DropdownButton title={`Năm ${selectedYear}`} className="mb-3">
+                {[...Array(10).keys()].map((year) => (
+                  <Dropdown.Item
+                    key={year}
+                    onClick={() => setSelectedYear(currentYear - year)}
+                  >
+                    Năm {currentYear - year}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
             </div>
           )}
 
           {filterType === "quý" && (
-            <div className="font-monospace">
-              <h5 className="font-monospace">Chọn quý:</h5>
+            <div>
+              <h5>Chọn quý:</h5>
               <DropdownButton title={`Quý ${selectedQuarter}`} className="mb-3">
                 {[1, 2, 3, 4].map((quarter) => (
                   <Dropdown.Item
@@ -357,6 +393,18 @@ function Home() {
                     onClick={() => setSelectedQuarter(quarter)}
                   >
                     Quý {quarter}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+
+              <h5>Chọn năm:</h5>
+              <DropdownButton title={`Năm ${selectedYear}`} className="mb-3">
+                {[...Array(10).keys()].map((year) => (
+                  <Dropdown.Item
+                    key={year}
+                    onClick={() => setSelectedYear(currentYear - year)}
+                  >
+                    Năm {currentYear - year}
                   </Dropdown.Item>
                 ))}
               </DropdownButton>

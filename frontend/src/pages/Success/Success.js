@@ -1,18 +1,21 @@
 import React from "react";
-import style from "./Success.module.scss";
-import classNames from "classnames/bind";
 import logo from "../../assets/logo-barber.png";
 import { Link } from "react-router-dom";
-const cx = classNames.bind(style);
+
 export default function Success() {
   return (
-    <div className={cx("wrapper")}>
-      <div className={cx("form-logo")}>
-        <img src={logo} alt="" />
+    <div className="d-flex flex-column justify-content-center align-items-center vh-75bg-light font-monospace fw-bolder">
+      <div className="mb-5">
+        <img
+          src={logo}
+          alt="Logo"
+          className="img-fluid"
+          style={{ maxWidth: "550px" }}
+        />
       </div>
-      <p>ĐẶT THÀNH CÔNG</p>
-      <Link className={cx("back")} to="/">
-        TRỞ VỀ TRANG CHỦ
+      <p className="text-success font-monospace fs-3">Đặt thành công</p>
+      <Link to="/" className="btn btn-primary mt-3">
+        TRỞ VỀ
       </Link>
     </div>
   );

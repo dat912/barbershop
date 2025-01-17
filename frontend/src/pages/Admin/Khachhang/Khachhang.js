@@ -5,6 +5,7 @@ import numeral from "numeral";
 const Khachhang = () => {
   const [emailError, setEmailError] = useState("");
   const [passError, setPassError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const [user, setUser] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [showModalCreate, setShowModalCreate] = useState(false);
@@ -398,6 +399,15 @@ const Khachhang = () => {
                         e.target.value = "0" + e.target.value;
                       }
                       e.target.value = e.target.value.slice(0, 10);
+                      if (e.target.value.length < 10) {
+                        setPhoneError("Số điện thoại phải có đủ 10 chữ số.");
+                      } else {
+                        setPhoneError("");
+                      }
+                      setCurrentUser({
+                        ...currentUser,
+                        phone: e.target.value,
+                      });
                     }}
                     className="form-control"
                     value={currentUser.phone}
@@ -409,6 +419,9 @@ const Khachhang = () => {
                     }
                     placeholder="Enter Số điện thoại"
                   />
+                  {phoneError && (
+                    <span style={{ color: "red" }}>{phoneError}</span>
+                  )}
                 </div>
 
                 <div className="modal-footer px-0 pb-0">

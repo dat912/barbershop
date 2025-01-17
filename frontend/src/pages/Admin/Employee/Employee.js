@@ -2,6 +2,9 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 //import { useNavigate } from "react-router-dom";
 const Employee = () => {
+  const [emailError, setEmailError] = useState("");
+  const [passError, setPassError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const [employees, setEmployees] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState("add"); // 'add' or 'edit'
@@ -123,7 +126,7 @@ const Employee = () => {
       } catch (error) {
         if (error.response) {
           if (error.response.status >= 500) {
-            alert("Lỗi hệ thống. Vui lòng thử lại sau!");
+            alert("Không thể xóa nhân viên này!");
           } else {
             alert(error.response.data.message || "Có lỗi xảy ra khi xóa ");
           }
@@ -253,14 +256,27 @@ const Employee = () => {
                     type="email"
                     className="form-control"
                     value={currentEmployee.email}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const email = e.target.value;
+                      const emailRegex =
+                        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+                      if (!emailRegex.test(email)) {
+                        setEmailError("Email không hợp lệ");
+                      } else {
+                        setEmailError("");
+                      }
+
                       setCurrentEmployee({
                         ...currentEmployee,
                         email: e.target.value,
-                      })
-                    }
+                      });
+                    }}
                     placeholder="Enter Email"
                   />
+                  {emailError && (
+                    <span style={{ color: "red" }}>{emailError}</span>
+                  )}
                 </div>
 
                 {modalMode === "add" && (
@@ -270,12 +286,12 @@ const Employee = () => {
                       type="password"
                       className="form-control"
                       value={currentEmployee.password}
-                      onChange={(e) =>
+                      onChange={(e) => {
                         setCurrentEmployee({
                           ...currentEmployee,
                           password: e.target.value,
-                        })
-                      }
+                        });
+                      }}
                       placeholder="Enter Password"
                     />
                   </div>
@@ -288,17 +304,33 @@ const Employee = () => {
                     className="form-control"
                     value={currentEmployee.phone}
                     maxLength={10}
-                    onInput={(e) =>
-                      (e.target.value = e.target.value.replace(/[^0-9]/g, ""))
-                    }
                     onChange={(e) =>
                       setCurrentEmployee({
                         ...currentEmployee,
                         phone: e.target.value,
                       })
                     }
+                    onInput={(e) => {
+                      e.target.value = e.target.value.replace(/[^0-9]/g, "");
+                      if (!e.target.value.startsWith("0")) {
+                        e.target.value = "0" + e.target.value;
+                      }
+                      e.target.value = e.target.value.slice(0, 10);
+                      if (e.target.value.length < 10) {
+                        setPhoneError("Số điện thoại phải có đủ 10 chữ số.");
+                      } else {
+                        setPhoneError("");
+                      }
+                      setCurrentEmployee({
+                        ...currentEmployee,
+                        phone: e.target.value,
+                      });
+                    }}
                     placeholder="Enter Số điện thoại"
                   />
+                  {phoneError && (
+                    <span style={{ color: "red" }}>{phoneError}</span>
+                  )}
                 </div>
 
                 <div className="mb-3">

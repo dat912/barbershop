@@ -12,9 +12,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import numeral from "numeral";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 export default function Infor() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);
   const [user, setUser] = useState({
@@ -26,6 +27,12 @@ export default function Infor() {
   const [bookings, setBookings] = useState([]);
   const [hoadon, setHoadon] = useState([]);
   const userId = localStorage.getItem("id");
+
+  useEffect(() => {
+    if (!userId) {
+      navigate("/dang-nhap");
+    }
+  }, [userId, navigate]);
 
   const handleStatusUpdate = (bookingId) => {
     if (window.confirm("Bạn có đồng ý hủy lịch này không?")) {

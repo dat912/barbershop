@@ -360,7 +360,7 @@ const Product = () => {
                 <div className="mb-3">
                   <label className="form-label">Giá</label>
                   <input
-                    type="text"
+                    type="number"
                     className="form-control"
                     value={currentProduct.gia}
                     onChange={(e) =>

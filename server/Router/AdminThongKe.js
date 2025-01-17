@@ -35,7 +35,7 @@ router.get("/countNhanVien", (req, res) => {
 });
 
 router.get("/tongTienDatLich", (req, res) => {
-  const { filter, date, month, quarter } = req.query;
+  const { filter, date, month, quarter, year } = req.query;
   let sql;
 
   switch (filter) {
@@ -43,13 +43,10 @@ router.get("/tongTienDatLich", (req, res) => {
       sql = `SELECT SUM(tongtien) AS total FROM datlich WHERE ngay = '${date}'`;
       break;
     case "tháng":
-      sql = `SELECT SUM(tongtien) AS total FROM datlich WHERE MONTH(ngay) = ${month}`;
+      sql = `SELECT SUM(tongtien) AS total FROM datlich WHERE MONTH(ngay) = ${month} AND YEAR(ngay) = ${year}`;
       break;
     case "quý":
-      sql = `
-        SELECT SUM(tongtien) AS total FROM datlich 
-        WHERE QUARTER(ngay) = ${quarter}
-      `;
+      sql = `SELECT SUM(tongtien) AS total FROM datlich WHERE QUARTER(ngay) = ${quarter} AND YEAR(ngay) = ${year}`;
       break;
     default:
       sql = "SELECT SUM(tongtien) AS total FROM datlich";
@@ -62,7 +59,7 @@ router.get("/tongTienDatLich", (req, res) => {
 });
 
 router.get("/tongTienDonHang", (req, res) => {
-  const { filter, date, month, quarter } = req.query;
+  const { filter, date, month, quarter, year } = req.query;
   let sql;
 
   switch (filter) {
@@ -70,13 +67,10 @@ router.get("/tongTienDonHang", (req, res) => {
       sql = `SELECT SUM(tongtien) AS total FROM donhang WHERE DATE(created_at) = '${date}'`;
       break;
     case "tháng":
-      sql = `SELECT SUM(tongtien) AS total FROM donhang WHERE MONTH(created_at) = ${month}`;
+      sql = `SELECT SUM(tongtien) AS total FROM donhang WHERE MONTH(created_at) = ${month} AND YEAR(created_at) = ${year}`;
       break;
     case "quý":
-      sql = `
-        SELECT SUM(tongtien) AS total FROM donhang 
-        WHERE QUARTER(created_at) = ${quarter}
-      `;
+      sql = `SELECT SUM(tongtien) AS total FROM donhang WHERE QUARTER(created_at) = ${quarter} AND YEAR(created_at) = ${year}`;
       break;
     default:
       sql = "SELECT SUM(tongtien) AS total FROM donhang";
